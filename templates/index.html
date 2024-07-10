@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MobileMSK - Pose Tracking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f8ff; /* Light blue background */
+        }
+        .header {
+            background-color: #314a56; /* Deep blue header */
+            color: #e1a730;
+            width: 100%;
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        .video-container {
+            max-width: 800px;
+            width: 90%;
+            border: 3px solid #314a56;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>MobileMSK</h1>
+        <p>Innovative Pose Tracking for Better Health</p>
+    </div>
+    <div class="video-container">
+        <img src="{{ url_for('video_feed') }}" width="640" height="480">
+    </div>
+    <div class="footer">
+        <p>&copy; 2024 MobileMSK. All rights reserved.</p>
+    </div>
+</body>
+</html>
