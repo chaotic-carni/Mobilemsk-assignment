@@ -1,27 +1,119 @@
+
 from flask import Flask, Response, render_template
 import cv2
 from ultralytics import YOLO
 import numpy as np
+import torch
 
 app = Flask(__name__)
 
-# Load the YOLOv8 model
-model = YOLO('yolov8n-pose.pt')
-
+if torch.cuda.is_available():
+  print("Yayy GPU is available and potentially being used by Ultralytics.")
+else:
+  print("GPU is not available or not being used by Ultralytics.")
+model_pred = YOLO("yolov8n-pose.pt")
 # Initialize the video capture
 cap = cv2.VideoCapture(0)
 
+# def generate_frames():
+#     frame_count = 0
+#     while True:
+#         success, frame = cap.read()
+#         if not success:
+#             break
+#         else:
+#             frame = cv2.flip(frame, 1)
+#             frame_count += 1
+            
+#             if frame_count % 3 == 0:
+#                 # Run YOLOv8 inference on every 3rd frame
+#                 results = model_pred(frame)
+                
+#                 # Visualize the results on the frame
+#                 annotated_frame = results[0].plot()
+#             else:
+#                 # Use the original frame for other frames
+#                 annotated_frame = frame
+            
+#             # Encode the frame to JPEG
+#             ret, buffer = cv2.imencode('.jpg', annotated_frame)
+#             frame = buffer.tobytes()
+            
+#         yield (b'--frame\r\n'
+#                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+import cv2
+import numpy as np
+
+def extract_pose_lines(original, pose_output):
+    """
+    Extracts pose lines from the pose detection output and returns them on a transparent background.
+
+    Args:
+    original (np.array): The original image.
+    pose_output (np.array): The pose detection output image.
+
+    Returns:
+    np.array: An RGBA image with pose lines on a transparent background.
+    """
+    # Ensure both images are the same size
+    assert original.shape == pose_output.shape, "Images must be the same size"
+
+    # Calculate the absolute difference for each color channel
+    diff = cv2.absdiff(pose_output, original)
+
+    # Convert the difference to grayscale
+    diff_gray = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
+
+    # Apply thresholding to create a binary mask
+    _, mask = cv2.threshold(diff_gray, 30, 255, cv2.THRESH_BINARY)
+
+    # Create a transparent background
+    transparent = np.zeros((original.shape[0], original.shape[1], 4), dtype=np.uint8)
+
+    # Copy the colored pose lines to the transparent image
+    transparent[:,:,0] = cv2.bitwise_and(pose_output[:,:,0], mask)
+    transparent[:,:,1] = cv2.bitwise_and(pose_output[:,:,1], mask)
+    transparent[:,:,2] = cv2.bitwise_and(pose_output[:,:,2], mask)
+    transparent[:,:,3] = mask  # Use the mask for the alpha channel
+
+    return transparent
+
 def generate_frames():
+    frame_count = 0
+    last_pose_lines = None
     while True:
         success, frame = cap.read()
         if not success:
             break
         else:
-            # Run YOLOv8 inference on the frame
-            results = model(frame)
+            frame_count = ( frame_count + 1 ) % 3
             
-            # Visualize the results on the frame
-            annotated_frame = results[0].plot()
+            if frame_count == 0:
+                # Run YOLOv8 inference on every 3rd frame
+                results = model_pred(frame)
+                
+                # Visualize the results on the frame
+                annotated_frame = results[0].plot()
+                
+                # Extract pose lines
+                last_pose_lines = extract_pose_lines(frame, annotated_frame)
+            else:
+                # Use the original frame for other frames
+                annotated_frame = frame.copy()
+            
+            # Overlay the last extracted pose lines if available
+            if last_pose_lines is not None:
+                # Ensure last_pose_lines and annotated_frame have the same size
+                if last_pose_lines.shape[:2] != annotated_frame.shape[:2]:
+                    last_pose_lines = cv2.resize(last_pose_lines, (annotated_frame.shape[1], annotated_frame.shape[0]))
+                
+                # Create a mask from the alpha channel of last_pose_lines
+                mask = last_pose_lines[:,:,3] / 255.0
+                
+                # Blend the pose lines with the frame
+                for c in range(0, 3):
+                    annotated_frame[:,:,c] = annotated_frame[:,:,c] * (1 - mask) + last_pose_lines[:,:,c] * mask
             
             # Encode the frame to JPEG
             ret, buffer = cv2.imencode('.jpg', annotated_frame)
@@ -41,3 +133,4 @@ def video_feed():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
