@@ -2,7 +2,7 @@ Hello World!
 
 To check-out the web-app, follow the steps
 
-1. Create a new folder <code>New folder</code>
+1. Create a new folder <code>Folder_Name</code>
 2. Clone this repositry into the new Folder
 3. Create a virtual environment by <code>python -m venv venv</code>
 4. Activate the virtual environment using <code> venv\scripts\activate.bat </code> and restart the terminal.
