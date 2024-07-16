@@ -46,7 +46,7 @@ def extract_keypoints(results):
 def get_class_name(num):
     if len(num) == 1:
         if num == 1:
-            return "Downdog"
+            return "Adho Mukha"
         elif num == 2:
             return "Goddess"
         elif num == 3:
