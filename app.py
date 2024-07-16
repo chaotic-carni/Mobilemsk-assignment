@@ -1,9 +1,12 @@
-
+# %%
 from flask import Flask, Response, render_template
 import cv2
 from ultralytics import YOLO
 import numpy as np
 import torch
+from keras._tf_keras.keras.models import load_model
+
+model1 = load_model(r"D:\archith\project\model\model.h5")
 
 app = Flask(__name__)
 
@@ -11,10 +14,10 @@ if torch.cuda.is_available():
   print("Yayy GPU is available and potentially being used by Ultralytics.")
 else:
   print("GPU is not available or not being used by Ultralytics.")
-model_pred = YOLO("yolov8n-pose.pt")
+model_pred = YOLO("D:\BITS\PS1\pose\posenet-python-master\yolov8n-pose.pt")
 # Initialize the video capture
 cap = cv2.VideoCapture(0)
-
+# %%
 # def generate_frames():
 #     frame_count = 0
 #     while True:
@@ -79,6 +82,26 @@ def extract_pose_lines(original, pose_output):
 
     return transparent
 
+def extract_keypoints(results):
+    keypoints_list = []
+    for result in results:
+        keypoints = result.keypoints.xyn
+        keypoints_list.append(keypoints.cpu().numpy())
+    return keypoints_list
+
+def print_class(num):
+    if len(num) == 1:
+        if num == 1:
+            print("downdog")
+        elif num ==2 :
+            print("goddess")
+        elif num ==3 :
+            print("plank")
+        elif num ==4 :
+            print("standing")
+        elif num ==5 :
+            print("warrior")
+
 def generate_frames():
     frame_count = 0
     last_pose_lines = None
@@ -87,11 +110,15 @@ def generate_frames():
         if not success:
             break
         else:
-            frame_count = ( frame_count + 1 ) % 3
+            frame_count += 1
             
-            if frame_count == 0:
+            if frame_count % 3 == 0:
                 # Run YOLOv8 inference on every 3rd frame
-                results = model_pred(frame)
+                results = model_pred(frame, device='cpu')
+                keypoints = extract_keypoints(results)
+                prediction = model1.predict(keypoints)
+                predicted_class = np.argmax(prediction, axis=1)
+                print_class(predicted_class)
                 
                 # Visualize the results on the frame
                 annotated_frame = results[0].plot()
@@ -133,4 +160,8 @@ def video_feed():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+# %%
+
+
 
