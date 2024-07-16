@@ -1,4 +1,5 @@
-Hello World!
+# AsanaAI: A real-time pose detection model
+***Hello World !***
 
 To check-out the web-app, follow the steps
 
@@ -11,4 +12,4 @@ To check-out the web-app, follow the steps
 7. Go the local web server created it will be of the form <url> http://127.0.0.1:5000/ </url>
 8. Press <code> Ctrl + C </code> in the terminal to quit.
 
-Thank you
+**Thank you**
