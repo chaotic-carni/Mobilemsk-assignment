@@ -80,7 +80,7 @@ def generate_frames():
         if not success:
             break
         else:
-            frame_count = (frame_count + 1) % 5
+            frame_count = (frame_count + 1) % 3
             
             if frame_count == 0:
                 # Run YOLOv8 inference on every 3rd frame
