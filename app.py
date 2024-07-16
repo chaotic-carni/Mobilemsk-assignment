@@ -2,17 +2,11 @@ from flask import Flask, Response, render_template, stream_with_context
 import cv2
 from ultralytics import YOLO
 import numpy as np
-import torch
 from keras._tf_keras.keras.models import load_model
 import time
 
 model1 = load_model(r"model.h5")
 app = Flask(__name__)
-
-if torch.cuda.is_available():
-    print("Yayy GPU is available and potentially being used by Ultralytics.")
-else:
-    print("GPU is not available or not being used by Ultralytics.")
 
 model_pred = YOLO("yolov8n-pose.pt")
 
