@@ -2,8 +2,5 @@ FLASK
 ultralytics
 numpy
 opencv-python
-torch==2.3.0
-torchvision==0.18.0
-torchaudio==2.3.0
 tensorflow
 --extra-index-url https://download.pytorch.org/whl/cu121
