@@ -46,15 +46,15 @@ def extract_keypoints(results):
 def get_class_name(num):
     if len(num) == 1:
         if num == 1:
-            return "downdog"
+            return "Downdog"
         elif num == 2:
-            return "goddess"
+            return "Goddess"
         elif num == 3:
-            return "plank"
+            return "Plank"
         elif num == 4:
-            return "standing"
+            return "Standing"
         elif num == 5:
-            return "warrior"
+            return "Warrior"
     return ""
 
 def generate_frames():
