@@ -1,4 +1,4 @@
-# %%
+
 from flask import Flask, Response, render_template
 import cv2
 from ultralytics import YOLO
@@ -6,7 +6,7 @@ import numpy as np
 import torch
 from keras._tf_keras.keras.models import load_model
 
-model1 = load_model(r"D:\archith\project\model\model.h5")
+model1 = load_model(r"model.h5")
 
 app = Flask(__name__)
 
@@ -14,10 +14,10 @@ if torch.cuda.is_available():
   print("Yayy GPU is available and potentially being used by Ultralytics.")
 else:
   print("GPU is not available or not being used by Ultralytics.")
-model_pred = YOLO("D:\BITS\PS1\pose\posenet-python-master\yolov8n-pose.pt")
+model_pred = YOLO("yolov8n-pose.pt")
 # Initialize the video capture
 cap = cv2.VideoCapture(0)
-# %%
+
 # def generate_frames():
 #     frame_count = 0
 #     while True:
@@ -110,11 +110,11 @@ def generate_frames():
         if not success:
             break
         else:
-            frame_count += 1
+            frame_count = (frame_count + 1) % 5
             
-            if frame_count % 3 == 0:
+            if frame_count == 0:
                 # Run YOLOv8 inference on every 3rd frame
-                results = model_pred(frame, device='cpu')
+                results = model_pred(frame)
                 keypoints = extract_keypoints(results)
                 prediction = model1.predict(keypoints)
                 predicted_class = np.argmax(prediction, axis=1)
@@ -160,8 +160,3 @@ def video_feed():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-# %%
-
-
-
