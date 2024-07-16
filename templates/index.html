@@ -41,6 +41,30 @@
             max-width: 1200px;
             width: 100%;
         }
+        .pose-gallery, .tracker-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .pose-gallery {
+            width: 560px;
+            height: 315px;
+            position: relative;
+        }
+        .pose-gallery img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .pose-gallery img.active {
+            opacity: 1;
+        }
         .video-container, .tracker-container {
             background-color: #ffffff;
             border-radius: 8px;
@@ -76,8 +100,20 @@
     <main class="main-content">
         <h1>Innovative Pose Tracking for Better Health</h1>
         <div class="container">
-            <div class="video-container">
+            <!-- <div class="video-container">
                 <iframe id="youtube-video" width="560" height="375" src="https://www.youtube.com/embed/ZP34IA0d8LI" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div> -->
+            <div class="pose-gallery">
+                <img src="{{url_for('static', filename='/Image/downdog.jpeg')}}" alt="Downward Dog" class="active">
+                <img src="https://media.giphy.com/media/UW8VVu5c2OBUy43cos/giphy.gif" alt="Breathe and Relax">
+                <img src="{{url_for('static', filename='/Image/goddess.jpg')}}" alt="Goddess Pose">
+                <img src="https://media.giphy.com/media/7PK51oAq6EcUnrQYmW/giphy.gif" alt="Breathe and Relax">
+                <img src="{{url_for('static', filename='/Image/plank.png')}}" alt="Plank Pose">
+                <img src="https://media.giphy.com/media/l3vRadppGLD2MVCtG/giphy.gif" alt="Breathe and Relax">
+                <img src="{{url_for('static', filename='/Image/standing.webp')}}" alt="Standing Pose">
+                <img src="https://media.giphy.com/media/UW8VVu5c2OBUy43cos/giphy.gif" alt="Breathe and Relax">
+                <img src="{{url_for('static', filename='/Image/warrior.jpg')}}" alt="Warrior Pose">
+                <img src="https://media.giphy.com/media/7PK51oAq6EcUnrQYmW/giphy.gif" alt="Breathe and Relax">
             </div>
             <div class="tracker-container">
                 <img src="{{ url_for('video_feed') }}" id="video" width="560" height="375">
@@ -93,14 +129,27 @@
     </footer>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+            document.addEventListener("DOMContentLoaded", function() {
             const video = document.getElementById('video');
-            const youtubeVideo = document.getElementById('youtube-video');
             const detectedPose = document.getElementById('detected-pose');
+            const poseImages = document.querySelectorAll('.pose-gallery img');
+            let currentPoseIndex = 0;
 
-            video.addEventListener('play', function() {
-                youtubeVideo.src += "?autoplay=1";
-            });
+            const poseDuration = 30000; // 30 seconds for yoga poses
+            const relaxDuration = 10000; // 10 seconds for breathe and relax GIFs
+
+            function rotatePoseImage() {
+                poseImages[currentPoseIndex].classList.remove('active');
+                currentPoseIndex = (currentPoseIndex + 1) % poseImages.length;
+                poseImages[currentPoseIndex].classList.add('active');
+
+                // Set the next timeout based on whether it's a pose or a relax GIF
+                const nextDuration = currentPoseIndex % 2 === 0 ? poseDuration : relaxDuration;
+                setTimeout(rotatePoseImage, nextDuration);
+            }
+
+            // Start the rotation
+            setTimeout(rotatePoseImage, poseDuration);
 
             const eventSource = new EventSource("/class_feed");
             eventSource.onmessage = function(event) {
