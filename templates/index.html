@@ -3,56 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MobileMSK - Pose Tracking</title>
+    <title>MobileMSK - Innovative Pose Tracking</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
             min-height: 100vh;
-            margin: 0;
-            background-color: #f0f8ff; /* Light blue background */
+            background-color: #e1a730;
+            color: #314a56;
         }
         .header {
-            background-color: #314a56; /* Deep blue header */
-            color: #e1a730;
-            width: 100%;
-            text-align: center;
+            background-color: #314a56;
             padding: 20px 0;
-            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .video-container {
-            max-width: 800px;
-            width: 90%;
-            border: 3px solid #314a56;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        img {
-            width: 100%;
+        .logo {
+            max-width: 200px;
             height: auto;
-            display: block;
+        }
+        .main-content {
+            color: #314a56;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+        }
+        .video-container, .tracker-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .pose-display {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #3498db;
         }
         .footer {
-            margin-top: 30px;
+            background-color: #314a56;
+            color: #fff;
             text-align: center;
-            color: #333;
+            padding: 20px 0;
+            font-size: 14px;
+        }
+        h1 {
+            color: #3498db;
+            font-size: 28px;
+            margin-bottom: 30px;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>MobileMSK</h1>
-        <p>Innovative Pose Tracking for Better Health</p>
-    </div>
-    <div class="video-container">
-        <img src="{{ url_for('video_feed') }}" width="640" height="480">
-    </div>
-    <div class="footer">
-        <p>&copy; 2024 MobileMSK. All rights reserved.</p>
-    </div>
+    <header class="header">
+        <img src="{{url_for('static', filename='/Image/logo.png')}}" alt="MobileMSK Logo" class="logo">
+    </header>
+
+    <main class="main-content">
+        <h1>Innovative Pose Tracking for Better Health</h1>
+        <div class="container">
+            <div class="video-container">
+                <iframe id="youtube-video" width="560" height="375" src="https://www.youtube.com/embed/ZP34IA0d8LI" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="tracker-container">
+                <img src="{{ url_for('video_feed') }}" id="video" width="560" height="375">
+                <div class="pose-display">
+                    Detected Pose: <span id="detected-pose">waiting</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        © 2024 MobileMSK. All rights reserved.
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const video = document.getElementById('video');
+            const youtubeVideo = document.getElementById('youtube-video');
+            const detectedPose = document.getElementById('detected-pose');
+
+            video.addEventListener('play', function() {
+                youtubeVideo.src += "?autoplay=1";
+            });
+
+            const eventSource = new EventSource("/class_feed");
+            eventSource.onmessage = function(event) {
+                detectedPose.textContent = event.data;
+            };
+        });
+    </script>
 </body>
 </html>
