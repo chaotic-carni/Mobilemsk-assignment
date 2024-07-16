@@ -1,4 +1,3 @@
-
 from flask import Flask, Response, render_template
 import cv2
 from ultralytics import YOLO
@@ -15,38 +14,9 @@ if torch.cuda.is_available():
 else:
   print("GPU is not available or not being used by Ultralytics.")
 model_pred = YOLO("yolov8n-pose.pt")
+
 # Initialize the video capture
 cap = cv2.VideoCapture(0)
-
-# def generate_frames():
-#     frame_count = 0
-#     while True:
-#         success, frame = cap.read()
-#         if not success:
-#             break
-#         else:
-#             frame = cv2.flip(frame, 1)
-#             frame_count += 1
-            
-#             if frame_count % 3 == 0:
-#                 # Run YOLOv8 inference on every 3rd frame
-#                 results = model_pred(frame)
-                
-#                 # Visualize the results on the frame
-#                 annotated_frame = results[0].plot()
-#             else:
-#                 # Use the original frame for other frames
-#                 annotated_frame = frame
-            
-#             # Encode the frame to JPEG
-#             ret, buffer = cv2.imencode('.jpg', annotated_frame)
-#             frame = buffer.tobytes()
-            
-#         yield (b'--frame\r\n'
-#                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-import cv2
-import numpy as np
 
 def extract_pose_lines(original, pose_output):
     """
